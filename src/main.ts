@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as globby from 'globby';
 import * as stateHelper from './state-helper';
 import * as core from '@actions/core';
 import * as actionsToolkit from '@docker/actions-toolkit';
@@ -85,6 +86,21 @@ actionsToolkit.run(
     const imageID = BuildxInputs.resolveBuildImageID();
     const metadata = BuildxInputs.resolveBuildMetadata();
     const digest = BuildxInputs.resolveDigest();
+
+    const filepath = BuildxInputs.getBuildMetadataFilePath();
+
+    core.info("filepath: " + filepath)
+    const dirname = path.dirname(filepath);
+    var files = fs.readdirSync(dirname, {withFileTypes: true})
+    .map(item => item.name)
+    core.info("files in dir: " + JSON.stringify(files))
+    // fs.stat(filepath, (err, stats) => {
+    //   if (err) {
+    //     core.error("error reading file: " + err);
+    //   }
+    //   core.info("stat of file")
+    //   core.info(JSON.stringify(stats))
+    // });
 
     if (imageID) {
       await core.group(`ImageID`, async () => {
